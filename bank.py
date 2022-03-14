@@ -24,9 +24,8 @@ def createTransaction(amount):
 
 
 option = 9
-bID = b'1234567890'
-bKey = SHA256.new(bID)
-print(bKey.digest())
+bKey = "F25D58A0E3E4436EC646B58B1C194C6B505AB1CB6B9DE66C894599222F07B893"
+
 
 
 
