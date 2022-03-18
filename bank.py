@@ -57,23 +57,11 @@ def createTransaction(amount):
 	cipherText = b64encode(cipherTextBytes).decode('utf-8')
 	emd = json.dumps({'iv':iv, 'ciphertext':cipherText})
 	print(emd)
-	#print(tag.hex())
-	#print(cipher.nonce.hex())
-
-
 
 
 
 
 	print("-----------------------------------------------")
-	#cipher2 = AES.new(kWallet.digest(), AES.MODE_CBC, bytes.fromhex(cipher.nonce.hex()))
-	#plaintext = cipher2.decrypt(cipherText)
-	#try:
-	#	cipher2.verify(tag)
-	#	print("Message: " + plaintext.hex())
-	#except ValueError:
-	#	print("Incorrect key or corrupted message\n")
-
 	try:
 		encryptedJson = json.loads(emd)
 		iv2 = b64decode(encryptedJson['iv'])
