@@ -37,7 +37,7 @@ kBank = "F25D58A0E3E4436EC646B58B1C194C6B505AB1CB6B9DE66C894599222F07B893"
 
 
 #wallet's secret key generated using AES-256
-#wCipher = AES.new(kWallet.digest(), AES.MODE_GCM)
+#wCipher = AES.new(kWallet.digest(), AES.MODE_EAX)
 #nonce = wCipher.nonce
 #print(nonce)
 #nonceStr = base64.b64encode(nonce).decode('utf-8')
