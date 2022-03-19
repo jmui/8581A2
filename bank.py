@@ -17,9 +17,6 @@ from Crypto.Util.Padding import pad
 
 
 option = 9
-#this value is from the assignment instructions
-kBank = "F25D58A0E3E4436EC646B58B1C194C6B505AB1CB6B9DE66C894599222F07B893"
-
 
 
 

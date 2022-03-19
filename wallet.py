@@ -18,19 +18,22 @@ from Crypto.Util.Padding import pad
 from Crypto.Util.Padding import unpad
 
 
+
 #encrypted a string in JSON format
 #outputs encrypted JSON token
 #does not return anything
 def encryption(inputString, key):
 	byteString = bytes.fromhex(inputString)
-	#print(byteString)
-	#print(byteString.hex())
 	cipher = AES.new(key.digest(), AES.MODE_CBC)
 	ciphertextBytes = cipher.encrypt(pad(byteString, AES.block_size))
 	iv = b64encode(cipher.iv).decode('utf-8')
 	ciphertext = b64encode(ciphertextBytes).decode('utf-8')
 	output = json.dumps({'iv':iv, 'ct':ciphertext})
+	print("Token:")
 	print(output)
+	print("\n")
+
+
 
 #decrypt a string in JSON format
 #returns plaintext string
@@ -47,18 +50,32 @@ def decryption(inputString, key):
 	return plaintext
 
 
+
 #pad string with zeroes
 #returns a string
-def padZeroes(inputString, numZeroes):
+def padZeroes(inputString, count):
 
-	numZeroes = 8 - len(inputString)
+	numZeroes = count - len(inputString)
 	zeroes = ""
-	if numZeroes > 0 and numZeroes < 8:
+	if numZeroes > 0 and numZeroes < count:
 		for i in range(numZeroes):
 			zeroes = zeroes + "0"
 		inputString = zeroes + inputString
 
 	return inputString
+
+
+
+#increment counter
+#input is hex string
+#returns hex string
+def incrementCounter(counter):
+
+	counter = hex(int(counter, 16) + int(1, 16))
+
+	return counter
+
+
 
 #generate token for synchronizing wallets and sending money
 #all arguments must be strings
@@ -99,6 +116,7 @@ def generateToken(wID, wIDB, amount, counter):
 	return token
 
 
+
 #withdraw money from bank
 #emd input must be a JSON formatted string
 def bankWithdrawl(kWallet):
@@ -109,6 +127,7 @@ def bankWithdrawl(kWallet):
 	print("Withdrawing: $" + str(value))
 
 	return value
+
 
 
 #synchronize 2 wallets
@@ -126,8 +145,17 @@ def syncWallets(walletList, wID, kBank):
 	#enter token encrypted with kBank
 	receivedTokenEncrypted = input("Enter token sent by recipient wallet: ")
 	receivedToken = decryption(receivedTokenEncrypted, kBank)
+	receivedTokenString = receivedToken.hex()
+	#print(receivedTokenString)
 
-	print(receivedToken.hex())
+	#parse string for recipient wallet ID and counter
+	recipientWallet = receivedTokenString[0:8]
+	counter = receivedTokenString[24:32]
+	print(counter)
+	counter = incrementCounter(counter)
+	print(counter)
+	return walletList
+
 
 
 def sendMoney(amount, balance):
@@ -154,21 +182,20 @@ wID = sIDInput[-4:]
 kWallet = SHA256.new(sID)
 #print("Wallet secret key: " + kWallet.hexdigest())
 
-#bank's secret key. taken from assignment instructions
-#kBank = "F25D58A0E3E4436EC646B58B1C194C6B505AB1CB6B9DE66C894599222F07B893"
+
 #used for generating the bank's secret key
 #could not hard code the one from assignment instructions since it needs to be an SHA256 object
 bankID = "FSCT8581"
 bankID = str.encode(bankID)
 kBank = SHA256.new(bankID)
-#kBank = kBank.hexdigest()
+
 
 
 #main menu loop
 while option != 0:
-	print("\n------------------------------")
+	print("\n---------------------------------")
 	print("1: Withdraw from bank\n2: Synchronize wallets\n3: Send money\n4: Receive money\n5: Print balance\n6: Exit")
-	print("------------------------------")
+	print("---------------------------------")
 	option = input("Select an option: ")
 	print("\n")
 	if option == "1":
