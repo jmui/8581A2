@@ -22,11 +22,15 @@ from Crypto.Util.Padding import unpad
 #outputs encrypted JSON token
 #does not return anything
 def encryption(inputString, key):
-
-
-
-
-
+	byteString = bytes.fromhex(inputString)
+	#print(byteString)
+	#print(byteString.hex())
+	cipher = AES.new(key.digest(), AES.MODE_CBC)
+	ciphertextBytes = cipher.encrypt(pad(byteString, AES.block_size))
+	iv = b64encode(cipher.iv).decode('utf-8')
+	ciphertext = b64encode(ciphertextBytes).decode('utf-8')
+	output = json.dumps({'iv':iv, 'ct':ciphertext})
+	print(output)
 
 #decrypt a string in JSON format
 #returns plaintext string
@@ -43,6 +47,18 @@ def decryption(inputString, key):
 	return plaintext
 
 
+#pad string with zeroes
+#returns a string
+def padZeroes(inputString, numZeroes):
+
+	numZeroes = 8 - len(inputString)
+	zeroes = ""
+	if numZeroes > 0 and numZeroes < 8:
+		for i in range(numZeroes):
+			zeroes = zeroes + "0"
+		inputString = zeroes + inputString
+
+	return inputString
 
 #generate token for synchronizing wallets and sending money
 #all arguments must be strings
@@ -55,45 +71,25 @@ def generateToken(wID, wIDB, amount, counter):
 	wID = int(wID)
 	wIDHex = hex(wID)
 	wIDHex = wIDHex[2:]
-	numZeroes = 8 - len(wIDHex)
-	zeroes = ""
-	if numZeroes > 0 and numZeroes < 8:
-		for i in range(numZeroes):
-			zeroes = zeroes + "0"
-		wIDHex = zeroes + wIDHex
+	wIDHex = padZeroes(wIDHex, 8)
 
 	wIDB = int(wIDB)
 	wIDBHex = hex(wIDB)
 	wIDBHex = wIDBHex[2:]
-	numZeroes = 8 - len(wIDBHex)
-	zeroes = ""
-	if numZeroes > 0 and numZeroes < 8:
-		for i in range(numZeroes):
-			zeroes = zeroes + "0"
-		wIDBHex = zeroes + wIDBHex
+	wIDBHex = padZeroes(wIDBHex, 8)
 
 
 	#convert amount to hex format, then pad with 0s
 	amount = int(amount)
 	amountHex = hex(amount)
 	amountHex = amountHex[2:]
-	numZeroes = 8 - len(amountHex)
-	zeroes = ""
-	if numZeroes > 0 and numZeroes < 8:
-		for i in range(numZeroes):
-			zeroes = zeroes + "0"
-		amountHex = zeroes + amountHex
+	amountHex = padZeroes(amountHex, 8)
 
 	#convert counter to hex format, then pad with 0s
 	counter = int(counter)
 	counterHex = hex(counter)
 	counterHex = counterHex[2:]
-	numZeroes = 8 - len(counterHex)
-	zeroes = ""
-	if numZeroes > 0 and numZeroes < 8:
-		for i in range(numZeroes):
-			zeroes = zeroes + "0"
-		counterHex = zeroes + counterHex
+	counterHex = padZeroes(counterHex, 8)
 
 	#generate token string
 	#all values in hex format
@@ -118,7 +114,7 @@ def bankWithdrawl(kWallet):
 #synchronize 2 wallets
 #amount and counter are 0
 def syncWallets(walletList, wID, kBank):
-	wIDBInput = input("Enter 8 digit ID of recipient wallet: ")
+	wIDBInput = input("Enter 4 digit ID of recipient wallet: ")
 	wIDB = wIDBInput[-4:]
 
 	#generate synchronization token
@@ -130,7 +126,8 @@ def syncWallets(walletList, wID, kBank):
 	#enter token encrypted with kBank
 	receivedTokenEncrypted = input("Enter token sent by recipient wallet: ")
 	receivedToken = decryption(receivedTokenEncrypted, kBank)
-	print(receivedToken)
+
+	print(receivedToken.hex())
 
 
 def sendMoney(amount, balance):
@@ -158,9 +155,13 @@ kWallet = SHA256.new(sID)
 #print("Wallet secret key: " + kWallet.hexdigest())
 
 #bank's secret key. taken from assignment instructions
-kBank = "F25D58A0E3E4436EC646B58B1C194C6B505AB1CB6B9DE66C894599222F07B893"
-
-
+#kBank = "F25D58A0E3E4436EC646B58B1C194C6B505AB1CB6B9DE66C894599222F07B893"
+#used for generating the bank's secret key
+#could not hard code the one from assignment instructions since it needs to be an SHA256 object
+bankID = "FSCT8581"
+bankID = str.encode(bankID)
+kBank = SHA256.new(bankID)
+#kBank = kBank.hexdigest()
 
 
 #main menu loop
