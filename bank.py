@@ -50,10 +50,10 @@ def createTransaction(amount):
 	#copy generated JSON string to the wallet to withdraw money
 	hexAmountBytes = bytes.fromhex(hexAmount)
 	cipher = AES.new(kWallet.digest(), AES.MODE_CBC)
-	cipherTextBytes = cipher.encrypt(pad(hexAmountBytes, AES.block_size))
+	ciphertextBytes = cipher.encrypt(pad(hexAmountBytes, AES.block_size))
 	iv = b64encode(cipher.iv).decode('utf-8')
-	cipherText = b64encode(cipherTextBytes).decode('utf-8')
-	emd = json.dumps({'iv':iv, 'ciphertext':cipherText})
+	ciphertext = b64encode(ciphertextBytes).decode('utf-8')
+	emd = json.dumps({'iv':iv, 'ct':ciphertext})
 	print("\nSending: $" + str(amount) + "\nTo wallet #: " + wID)
 	print("Token:")
 	print(emd)
