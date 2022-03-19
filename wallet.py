@@ -18,6 +18,31 @@ from Crypto.Util.Padding import pad
 from Crypto.Util.Padding import unpad
 
 
+#encrypted a string in JSON format
+#outputs encrypted JSON token
+#does not return anything
+def encryption(inputString, key):
+
+
+
+
+
+
+#decrypt a string in JSON format
+#returns plaintext string
+def decryption(inputString, key):
+	try:
+		encryptedJSON = json.loads(inputString)
+		iv = b64decode(encryptedJSON['iv'])
+		ciphertext = b64decode(encryptedJSON['ct'])
+		cipher = AES.new(key.digest(), AES.MODE_CBC, iv)
+		plaintext = unpad(cipher.decrypt(ciphertext), AES.block_size)
+	except (ValueError, KeyError):
+		print("Decryption failed. Could not withdraw from bank")
+
+	return plaintext
+
+
 
 #generate token for synchronizing wallets and sending money
 #all arguments must be strings
@@ -81,19 +106,11 @@ def generateToken(wID, wIDB, amount, counter):
 #withdraw money from bank
 #emd input must be a JSON formatted string
 def bankWithdrawl(kWallet):
-	value = 0
-	emd = input("Enter Electronic Money Draft token: ")
 
-	try:
-		encryptedJSON = json.loads(emd)
-		iv = b64decode(encryptedJSON['iv'])
-		ciphertext = b64decode(encryptedJSON['ct'])
-		cipher = AES.new(kWallet.digest(), AES.MODE_CBC, iv)
-		plaintext = unpad(cipher.decrypt(ciphertext), AES.block_size)
-		value = int(plaintext.hex(), 16)
-		print("Withdrawing: $" + str(value))
-	except (ValueError, KeyError):
-		print("Decryption failed. Could not withdraw from bank")
+	emd = input("Enter Electronic Money Draft token: ")
+	plaintext = decryption(emd, kWallet)
+	value = int(plaintext.hex(), 16)
+	print("Withdrawing: $" + str(value))
 
 	return value
 
@@ -107,11 +124,13 @@ def syncWallets(walletList, wID, kBank):
 	#generate synchronization token
 	#amount and counter start at 0
 	token = generateToken(wID, wIDB, "0", "0")
+	encryption(token, kBank)
+
 
 	#enter token encrypted with kBank
-	receiveToken = input("Enter token sent by recipient wallet: ")
-
-
+	receivedTokenEncrypted = input("Enter token sent by recipient wallet: ")
+	receivedToken = decryption(receivedTokenEncrypted, kBank)
+	print(receivedToken)
 
 
 def sendMoney(amount, balance):
