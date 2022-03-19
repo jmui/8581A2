@@ -8,11 +8,14 @@
 #need to install the pycryptodome library
 #pip install pycryptodome
 
-import base64
+import json
+from base64 import b64encode
+from base64 import b64decode
 from Crypto.Cipher import AES
 from Crypto.Hash import SHA256
 from Crypto.Random import get_random_bytes
-
+from Crypto.Util.Padding import pad
+from Crypto.Util.Padding import unpad
 
 
 option = 9
@@ -20,7 +23,6 @@ balance = 0.0
 #list of synchronized wallets
 walletList = []
 #sIDInput = input("Enter 8 digit student ID: ")
-#remove this later v
 sIDInput = "01237158"
 #student ID in byte format
 sID = str.encode(sIDInput)
@@ -53,10 +55,21 @@ def tokenGenerator(senderWID, receiverWID, amount, counter):
 	return token
 
 
-def bankWithdrawl(emd):
+def bankWithdrawl(kWallet):
 	value = 0
 
+	emd = input("Enter Electronic Money Draft: ")
 
+	try:
+		encryptedJSON = json.loads(emd)
+		iv = b64decode(encryptedJSON['iv'])
+		ciphertext = b64decode(encryptedJSON['ciphertext'])
+		cipher = AES.new(kWallet.digest(), AES.MODE_CBC, iv)
+		plaintext = unpad(cipher.decrypt(ciphertext), AES.block_size)
+		value = int(plaintext.hex(), 16)
+		print("Withdrawing: $" + str(value))
+	except (ValueError, KeyError):
+		print("Decryption failed, could not withdraw from bank")
 	return value
 
 
@@ -77,10 +90,7 @@ while option != 0:
 	print("1: Withdraw from bank\n2: Synchronize wallets\n3: Send money\n4: Receive money\n5: Print balance\n6: Exit")
 	option = input("Select an option: ")
 	if option == "1":
-		print("111")
-		#withdrawlAmount = input("Enter withdraw amount: ")
-		emd = input("Enter Electronic Money Draft: ")
-		balance = balance + bankWithdrawl(emd)
+		balance = balance + bankWithdrawl(kWallet)
 	elif option == "2":
 		print("222")
 	elif option == "3":
