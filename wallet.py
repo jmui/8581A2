@@ -5,7 +5,7 @@
 #wallet.py
 
 
-#need to install the pycryptodome library
+#requires pycryptodome library
 #pip install pycryptodome
 
 import json
@@ -19,16 +19,67 @@ from Crypto.Util.Padding import unpad
 
 
 
-
-def tokenGenerator(senderWID, receiverWID, amount, counter):
+#generate token for synchronizing wallets and sending money
+#all arguments must be strings
+#returns a string in hex format
+def generateToken(wID, wIDB, amount, counter):
 	token = ""
 
+	#convert wallet IDs to hex format, then remove 0x from string
+	#pad wallet IDs with 0s up to 8 characters
+	wID = int(wID)
+	wIDHex = hex(wID)
+	wIDHex = wIDHex[2:]
+	numZeroes = 8 - len(wIDHex)
+	zeroes = ""
+	if numZeroes > 0 and numZeroes < 8:
+		for i in range(numZeroes):
+			zeroes = zeroes + "0"
+		wIDHex = zeroes + wIDHex
+
+	wIDB = int(wIDB)
+	wIDBHex = hex(wIDB)
+	wIDBHex = wIDBHex[2:]
+	numZeroes = 8 - len(wIDBHex)
+	zeroes = ""
+	if numZeroes > 0 and numZeroes < 8:
+		for i in range(numZeroes):
+			zeroes = zeroes + "0"
+		wIDBHex = zeroes + wIDBHex
+
+
+	#convert amount to hex format, then pad with 0s
+	amount = int(amount)
+	amountHex = hex(amount)
+	amountHex = amountHex[2:]
+	numZeroes = 8 - len(amountHex)
+	zeroes = ""
+	if numZeroes > 0 and numZeroes < 8:
+		for i in range(numZeroes):
+			zeroes = zeroes + "0"
+		amountHex = zeroes + amountHex
+
+	#convert counter to hex format, then pad with 0s
+	counter = int(counter)
+	counterHex = hex(counter)
+	counterHex = counterHex[2:]
+	numZeroes = 8 - len(counterHex)
+	zeroes = ""
+	if numZeroes > 0 and numZeroes < 8:
+		for i in range(numZeroes):
+			zeroes = zeroes + "0"
+		counterHex = zeroes + counterHex
+
+	#generate token string
+	#all values in hex format
+	#sender wallet ID, receipient wallet ID, amount, counter
+	token = wIDHex + wIDBHex + amountHex + counterHex
 
 	return token
 
 
 #withdraw money from bank
-#emd input must be in JSON format string
+#emd input must be a JSON formatted string
 def bankWithdrawl(kWallet):
 	value = 0
 	emd = input("Enter Electronic Money Draft token: ")
@@ -43,7 +94,23 @@ def bankWithdrawl(kWallet):
 		print("Withdrawing: $" + str(value))
 	except (ValueError, KeyError):
 		print("Decryption failed. Could not withdraw from bank")
+
 	return value
+
+
+#synchronize 2 wallets
+#amount and counter are 0
+def syncWallets(walletList, wID, kBank):
+	wIDBInput = input("Enter 8 digit ID of recipient wallet: ")
+	wIDB = wIDBInput[-4:]
+
+	#generate synchronization token
+	#amount and counter start at 0
+	token = generateToken(wID, wIDB, "0", "0")
+
+	#enter token encrypted with kBank
+	receiveToken = input("Enter token sent by recipient wallet: ")
+
 
 
 
@@ -88,7 +155,7 @@ while option != 0:
 		balance = balance + bankWithdrawl(kWallet)
 		print("Balance: $" + str(balance))
 	elif option == "2":
-		print("222")
+		walletList = syncWallets(walletList, wID, kBank)
 	elif option == "3":
 		print("333")
 		sendAmount = input("Enter amount to send: ")

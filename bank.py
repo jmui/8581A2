@@ -5,7 +5,7 @@
 #bank.py
 
 
-#need to install pycryptodome library
+#requires pycryptodome library
 #pip install pycryptodome
 
 import json
