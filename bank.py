@@ -59,7 +59,9 @@ def createTransaction(amount):
 
 
 while option != 0:
-	print("\n1: Withdraw to wallet\n2: Exit")
+	print("\n---------------------------------")
+	print("1: Withdraw to wallet\n2: Exit")
+	print("---------------------------------")
 	option = input("Pick an option: ")
 
 	if option == "1":

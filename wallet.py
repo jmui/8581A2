@@ -36,7 +36,7 @@ def encryption(inputString, key):
 
 
 #decrypt a string in JSON format
-#returns plaintext string
+#returns plaintext byte code
 def decryption(inputString, key):
 	try:
 		encryptedJSON = json.loads(inputString)
@@ -218,7 +218,7 @@ def receiveMoney(balance, kBank, walletList, wID):
 	#enter token, then decrypt it using kBank
 	token = input("Enter token to receive funds: ")
 	plaintext = decryption(token, kBank)
-
+	plaintext = plaintext.hex()
 	#parse out the sender, receiver, amount, and counter from the plaintext
 	#they are still hex strings
 	sender = plaintext[0:8]
