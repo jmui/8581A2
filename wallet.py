@@ -66,17 +66,6 @@ def padZeroes(inputString, count):
 
 
 
-#increment counter
-#input is hex string
-#returns hex string
-def incrementCounter(counter):
-
-	counter = hex(int(counter, 16) + int(1, 16))
-
-	return counter
-
-
-
 #generate token for synchronizing wallets and sending money
 #all arguments must be strings
 #returns a string in hex format
