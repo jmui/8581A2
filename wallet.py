@@ -174,7 +174,8 @@ def syncWallets(walletList, wID, kBank):
 	return walletList
 
 
-
+#send money to another wallet
+#returns a tuple containing balance and walletList
 def sendMoney(wID, amount, balance, kBank, walletList):
 	walletExists = False
 	index = 0
@@ -204,14 +205,35 @@ def sendMoney(wID, amount, balance, kBank, walletList):
 	else:
 		print("Not enough balance to send this amount")
 
-	return balance
+	return balance, walletList
 
 
+
+#receive money from another wallet
+#returns a tuple containing balance and walletList
 def receiveMoney(balance, kBank, walletList):
+	walletExists = False
+	index = 0
+
+	#enter token, then decrypt it using kBank
+	token = input("Enter token to receive funds: ")
+	plaintext = decryption(token, kBank)
+
+	#parse out the sender, receiver, amount, and counter from the plaintext
+	#they are still hex strings
+	sender = plaintext[0:8]
+	receiver = plaintext[8:16]
+	amount = plaintext[16:24]
+	counter = plaintext[24:32]
+
+	#conver sender, receiver, amount, and counter to appropriate formats
 
 
 
-	return balance
+
+
+	
+	return balance, walletList
 
 
 
@@ -241,7 +263,7 @@ kBank = SHA256.new(bankID)
 #main menu loop
 while option != 0:
 	print("\n---------------------------------")
-	print("1: Withdraw from bank\n2: Synchronize wallets\n3: Send money\n4: Receive money\n5: Print balance\n6: Exit")
+	print("1: Withdraw from bank\n2: Synchronize wallets\n3: Send funds\n4: Receive funds\n5: Print balance\n6: Exit")
 	print("---------------------------------")
 	option = input("Select an option: ")
 	print("\n")
@@ -255,12 +277,12 @@ while option != 0:
 	elif option == "3":
 		sendAmount = input("Enter amount to send: ")
 		if sendAmount.isnumeric():
-			balance = sendMoney(wID, sendAmount, balance, kBank, walletList)
+			balance, walletList = sendMoney(wID, sendAmount, balance, kBank, walletList)
 		else:
 			print("Input is not numeric")
 
 	elif option == "4":
-		print("444")
+		balance, walletList = receiveMoney(balance, kBank, walletList)
 
 	elif option == "5":
 		print("Balance: $" + str(balance))
