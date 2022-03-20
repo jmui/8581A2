@@ -1,11 +1,12 @@
 # 8581A2
 
-** FSCT 8581 **
+**FSCT 8581**
 
-** A2 - Building an Electronic Cash Solution **
+**A2 - Building an Electronic Cash Solution**
 
-Justin Mui
+**Justin Mui**
 
+---
 
 Requirements:
 
@@ -19,7 +20,7 @@ https://pycryptodome.readthedocs.io/en/latest/src/installation.html
 
 Encryption uses AES in CBC mode
 
-SHA-256 is used for generating the key
+Key is generated using SHA-256
 
 
 
