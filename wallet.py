@@ -142,16 +142,14 @@ def syncWallets(walletList, wID, kBank):
 	token = generateToken(wID, wIDB, "0", "0")
 	encryption(token, kBank)
 
-
 	#enter token encrypted with kBank
 	receivedTokenEncrypted = input("Enter token sent by recipient wallet: ")
 	receivedToken = decryption(receivedTokenEncrypted, kBank)
 	receivedTokenString = receivedToken.hex()
 	#print(receivedTokenString)
 
-	#parse string for recipient wallet ID and counter
+	#parse string for recipient wallet ID
 	recipientWallet = receivedTokenString[0:8]
-	counter = receivedTokenString[24:32]
 
 	#get 4 digit ID in decimal format, then convert into string
 	wIDB = int(recipientWallet, 16)
@@ -170,18 +168,50 @@ def syncWallets(walletList, wID, kBank):
 		counter = 1
 		newWalletEntry = [wIDB, counter]
 		walletList.append(newWalletEntry)
-
+	else:
+		print("Duplicate wallet. " + str(wIDB) + " was not added to the list of wallets.")
 
 	return walletList
 
 
 
-def sendMoney(amount, balance):
+def sendMoney(wID, amount, balance, kBank, walletList):
+	walletExists = False
+	index = 0
+	wIDB = ""
+	amountNum = int(amount)
+
+	#ensure sender is not sending more money than the wallet contains
+	if amountNum <= balance:
+		wIDB = input("Enter 4 digit recipient wallet ID: ")
+		#check if recipient wallet exists in walletList
+		for i in range(len(walletList)):
+			if wIDB == walletList[i][0]:
+				walletExists = True
+				index = i
+				break
+
+		#send transaction only if wallet exists in walletList
+		if walletExists:
+			counter = str(walletList[index][1])
+			token = generateToken(wID, wIDB, amount, counter)
+			encryption(token, kBank)
+			balance = balance - amountNum
+			walletList[index][1] = walletList[index][1] + 1
+			print("Remaining balance: $" + str(balance))
+		else:
+			print("Recipient wallet is not synchronized")
+	else:
+		print("Not enough balance to send this amount")
+
+	return balance
+
+
+def receiveMoney(balance, kBank, walletList):
 
 
 
 	return balance
-
 
 
 
@@ -201,7 +231,7 @@ kWallet = SHA256.new(sID)
 #print("Wallet secret key: " + kWallet.hexdigest())
 
 #used for generating the bank's secret key
-#could not hard code the one from assignment instructions since it needs to be an SHA256 object
+#could not hard code the one from assignment instructions since pycryptodome needs to use an SHA256 object
 bankID = "FSCT8581"
 bankID = str.encode(bankID)
 kBank = SHA256.new(bankID)
@@ -218,19 +248,27 @@ while option != 0:
 	if option == "1":
 		balance = balance + bankWithdrawl(kWallet)
 		print("Balance: $" + str(balance))
+
 	elif option == "2":
 		walletList = syncWallets(walletList, wID, kBank)
+
 	elif option == "3":
-		print("333")
 		sendAmount = input("Enter amount to send: ")
-		balance = sendMoney(sendAmount, balance)
+		if sendAmount.isnumeric():
+			balance = sendMoney(wID, sendAmount, balance, kBank, walletList)
+		else:
+			print("Input is not numeric")
+
 	elif option == "4":
 		print("444")
+
 	elif option == "5":
 		print("Balance: $" + str(balance))
+
 	elif option == "6":
 		option = 0
 		print("Exiting\n")
+
 	else:
 		print("Invalid input\n")
 
