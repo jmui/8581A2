@@ -45,7 +45,7 @@ def decryption(inputString, key):
 		cipher = AES.new(key.digest(), AES.MODE_CBC, iv)
 		plaintext = unpad(cipher.decrypt(ciphertext), AES.block_size)
 	except (ValueError, KeyError):
-		print("Decryption failed. Could not withdraw from bank")
+		print("Decryption failed. Could not withdraw from bank.")
 
 	return plaintext
 
@@ -201,9 +201,9 @@ def sendMoney(wID, amount, balance, kBank, walletList):
 			walletList[index][1] = walletList[index][1] + 1
 			print("Remaining balance: $" + str(balance))
 		else:
-			print("Recipient wallet is not synchronized")
+			print("Recipient wallet is not synchronized.")
 	else:
-		print("Not enough balance to send this amount")
+		print("Not enough balance to send this amount.")
 
 	return balance, walletList
 
@@ -211,8 +211,8 @@ def sendMoney(wID, amount, balance, kBank, walletList):
 
 #receive money from another wallet
 #returns a tuple containing balance and walletList
-def receiveMoney(balance, kBank, walletList):
-	walletExists = False
+def receiveMoney(balance, kBank, walletList, wID):
+	continueReceive = True
 	index = 0
 
 	#enter token, then decrypt it using kBank
@@ -226,13 +226,41 @@ def receiveMoney(balance, kBank, walletList):
 	amount = plaintext[16:24]
 	counter = plaintext[24:32]
 
-	#conver sender, receiver, amount, and counter to appropriate formats
+	#convert sender, receiver, amount, and counter to appropriate formats
+	#string, string, int, int
+	senderString = int(sender, 16)
+	senderString = str(senderString)
+	receiverString = int(receiver, 16)
+	receiverString = str(receiverString)
+	amountNum = int(amount, 16)
+	counterNum = int(counter, 16)
+
+	#check if receiver matches this wallet's 4 digit ID
+	if wID != receiverString:
+		continueReceive = False
+
+	#check if sender is in walletList
+	if continueReceive:
+		for i in range(len(walletList)):
+			if senderString == walletList[i][0]:
+				index = i
+				break
+			else:
+					continueReceive = False
+					print("Sender's wallet is not synchronized.")
+
+	#check if the counter matches
+	#add amount to balance
+	#increment counter
+	if continueReceive:
+		if counterNum == walletList[index][1]:
+			balance = balance + amountNum
+			walletList[index][1] = walletList[index][1] + 1
+		else:
+			print("Counter does not match. Cannot deposit money.")
 
 
 
-
-
-	
 	return balance, walletList
 
 
@@ -282,7 +310,7 @@ while option != 0:
 			print("Input is not numeric")
 
 	elif option == "4":
-		balance, walletList = receiveMoney(balance, kBank, walletList)
+		balance, walletList = receiveMoney(balance, kBank, walletList, wID)
 
 	elif option == "5":
 		print("Balance: $" + str(balance))

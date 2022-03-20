@@ -24,7 +24,7 @@ def createTransaction(amount):
 
 	amount = int(amount)
 	#used for calculating KWallet using SHA-25
-	sIDInput = input("Enter 8 digit ID: ")
+	sIDInput = input("Enter 8 digit wallet ID: ")
 	sID = str.encode(sIDInput)
 	kWallet = SHA256.new(sID)
 	#print(kWallet.hexdigest())
