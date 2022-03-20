@@ -168,10 +168,12 @@ def syncWallets(walletList, wID, kBank):
 		counter = 1
 		newWalletEntry = [wIDB, counter]
 		walletList.append(newWalletEntry)
+		print("synchronized wallet: " + wIDB)
 	else:
 		print("Duplicate wallet. " + str(wIDB) + " was not added to the list of wallets.")
 
 	return walletList
+
 
 
 #send money to another wallet
