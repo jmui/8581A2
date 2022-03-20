@@ -135,7 +135,6 @@ def syncWallets(walletList, wID, kBank):
 	receivedTokenEncrypted = input("Enter token sent by recipient wallet: ")
 	receivedToken = decryption(receivedTokenEncrypted, kBank)
 	receivedTokenString = receivedToken.hex()
-	#print(receivedTokenString)
 
 	#parse string for recipient wallet ID
 	recipientWallet = receivedTokenString[0:8]
@@ -249,8 +248,6 @@ def receiveMoney(balance, kBank, walletList, wID):
 			walletList[index][1] = walletList[index][1] + 1
 		else:
 			print("Counter does not match. Cannot deposit money.")
-
-
 
 	return balance, walletList
 
