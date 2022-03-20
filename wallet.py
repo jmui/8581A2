@@ -133,6 +133,7 @@ def bankWithdrawl(kWallet):
 #synchronize 2 wallets
 #amount and counter are 0
 def syncWallets(walletList, wID, kBank):
+	newWallet = True
 	wIDBInput = input("Enter 4 digit ID of recipient wallet: ")
 	wIDB = wIDBInput[-4:]
 
@@ -151,9 +152,26 @@ def syncWallets(walletList, wID, kBank):
 	#parse string for recipient wallet ID and counter
 	recipientWallet = receivedTokenString[0:8]
 	counter = receivedTokenString[24:32]
-	print(counter)
-	counter = incrementCounter(counter)
-	print(counter)
+
+	#get 4 digit ID in decimal format, then convert into string
+	wIDB = int(recipientWallet, 16)
+	wIDB = str(wIDB)
+
+	#check if other wallet already exists in wallet list before synchronizing
+	if len(walletList) > 0:
+		for i in range(len(walletList)):
+			if wIDB == walletList[i][0]:
+				newWallet = False
+				break
+
+	#if the synchronized wallet is new
+	#increment counter to 1, then add to walletList
+	if newWallet:
+		counter = 1
+		newWalletEntry = [wIDB, counter]
+		walletList.append(newWalletEntry)
+
+
 	return walletList
 
 
@@ -181,7 +199,6 @@ wID = sIDInput[-4:]
 #wallet's key. SHA-256 hash of the student number. 32 bits
 kWallet = SHA256.new(sID)
 #print("Wallet secret key: " + kWallet.hexdigest())
-
 
 #used for generating the bank's secret key
 #could not hard code the one from assignment instructions since it needs to be an SHA256 object
