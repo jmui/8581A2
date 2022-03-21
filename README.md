@@ -22,7 +22,6 @@ Encryption uses AES in CBC mode
 
 Key is generated using SHA-256
 
-
-
+EMD token is generated in bank.py, then used in wallet.py to withdraw money.
 
 
