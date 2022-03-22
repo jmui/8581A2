@@ -255,8 +255,11 @@ def receiveMoney(balance, kBank, walletList, wID):
 
 option = 9
 balance = 0
+
 #list of synchronized wallets
 walletList = []
+
+#8 digit student ID for generate wallet key and getting 4 digit wallet ID
 sIDInput = input("Enter 8 digit ID: ")
 #student ID in byte format
 sID = str.encode(sIDInput)
@@ -266,7 +269,6 @@ wID = sIDInput[-4:]
 
 #wallet's key. SHA-256 hash of the student number. 32 bits
 kWallet = SHA256.new(sID)
-#print("Wallet secret key: " + kWallet.hexdigest())
 
 #used for generating the bank's secret key
 #could not hard code the one from assignment instructions since pycryptodome needs to use an SHA256 object

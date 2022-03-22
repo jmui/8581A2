@@ -8,9 +8,9 @@
 
 ---
 
-Requirements:
+**Requirements**
 
-PyCryptocome
+PyCryptodome
 
 https://pycryptodome.readthedocs.io/en/latest/src/installation.html
 
@@ -26,5 +26,5 @@ EMD token is generated in bank.py as a JSON string, then used in wallet.py to wi
 
 Tokens to sync wallets and to send/receive funds are also JSON strings.
 
-"FSCT8581" is used to generate the bank's key since I could not hard code the hex string from the assignment instructons. PyCryptodome's AES implementation appears to need an SHA256 object.
+"FSCT8581" is used to generate the bank's key since I could not hard code the hex string from the assignment instructons. PyCryptodome's AES implementation appears to need an "Crypto.Hash.SHA256.SHA256Hash" object.
 

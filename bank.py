@@ -19,7 +19,6 @@ from Crypto.Util.Padding import pad
 option = 9
 
 
-
 def createTransaction(amount):
 
 	amount = int(amount)
@@ -27,7 +26,6 @@ def createTransaction(amount):
 	sIDInput = input("Enter 8 digit wallet ID: ")
 	sID = str.encode(sIDInput)
 	kWallet = SHA256.new(sID)
-	#print(kWallet.hexdigest())
 	wID = sIDInput[-4:]
 
 	#convert amount to hex value, the remove 0x from string
